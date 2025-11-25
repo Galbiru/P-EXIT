@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project EXIT - Survey Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --pink-main: #fb46a9;
+            --pink-soft: #fec8e7;
+            --blue-main: #3b82f6;
+            --blue-soft: #bfdbfe;
+            --white-soft: #fdfbff;
+            --dark-text: #1e1b2f;
+            --muted: #6b7280;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 10px;
+            background:
+                radial-gradient(circle at top left, rgba(251, 70, 169, 0.25), transparent 55%),
+                radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.25), transparent 55%),
+                linear-gradient(135deg, #fdfbff 0%, #ffe4f5 35%, #e0efff 100%);
+            color: var(--dark-text);
+        }
+
+        .app-shell {
+            max-width: 480px;
+            margin: 0 auto;
+            border-radius: 26px;
+            background:
+                radial-gradient(circle at top right, rgba(251, 70, 169, 0.16), transparent 55%),
+                radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.18), transparent 60%),
+                linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 247, 252, 0.98));
+            border: 1px solid rgba(251, 70, 169, 0.2);
+            box-shadow:
+                0 20px 50px rgba(15, 23, 42, 0.18),
+                0 0 0 1px rgba(148, 163, 184, 0.25);
+            padding: 20px 16px 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-shell::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background:
+                radial-gradient(circle at 10% 0, rgba(251, 70, 169, 0.16), transparent 55%),
+                radial-gradient(circle at 90% 100%, rgba(59, 130, 246, 0.14), transparent 55%);
+            opacity: 1;
+            pointer-events: none;
+        }
+
+        .app-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .fade-transition { transition: opacity 0.35s ease; }
+
+        /* FLOATING EDIT BUTTON (TOP-RIGHT) */
+        #edit-users-btn {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 50;
+            border-radius: 999px;
+            border: 1px solid rgba(251, 70, 169, 0.8);
+            padding: 0.45rem 0.95rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #fb46a9, #fb7185, #3b82f6);
+            background-size: 170% auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            box-shadow:
+                0 14px 30px rgba(244, 63, 94, 0.45),
+                0 0 18px rgba(251, 70, 169, 0.3);
+        }
+
+        #edit-users-btn:hover {
+            background-position: right center;
+            transform: translateY(-1px);
+            box-shadow:
+                0 18px 38px rgba(244, 63, 94, 0.5),
+                0 0 24px rgba(59, 130, 246, 0.3);
+        }
+
+        .edit-btn-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #fb46a9;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* WELCOME PAGE */
+        #welcome-page {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 6px;
+        }
+
+        .badge-top {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--pink-main);
+            box-shadow: 0 0 0 3px rgba(251, 70, 169, 0.2);
+        }
+
+        .welcome-title {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.9rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: #1f2933;
+        }
+
+        .welcome-sub {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .welcome-panel {
+            margin-top: 0.5rem;
+            border-radius: 18px;
+            padding: 10px 12px;
+            background:
+                radial-gradient(circle at top left, rgba(251, 70, 169, 0.14), transparent 60%),
+                radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.16), transparent 60%),
+                linear-gradient(135deg, #fdfbff, #fff5fb);
+            border: 1px solid rgba(251, 70, 169, 0.25);
+        }
+
+        .welcome-panel-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: #fb46a9;
+            margin-bottom: 4px;
+        }
+
+        .welcome-panel-text {
+            font-size: 0.8rem;
+            color: #4b5563;
+        }
+
+        #start-btn {
+            margin-top: 1.6rem;
+            align-self: flex-start;
+            padding: 0.75rem 2.5rem;
+            border-radius: 999px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            cursor: pointer;
+            background-image: linear-gradient(135deg, #fb46a9, #fb7185, #3b82f6);
+            background-size: 180% auto;
+            color: #fff;
+            box-shadow:
+                0 14px 36px rgba(244, 63, 94, 0.55),
+                0 0 0 1px rgba(251, 70, 169, 0.4);
+            transition:
+                background-position 0.35s ease,
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+        #start-btn:hover {
+            background-position: right center;
+            transform: translateY(-1px);
+            box-shadow:
+                0 18px 44px rgba(244, 63, 94, 0.6),
+                0 0 24px rgba(59, 130, 246, 0.35);
+        }
+
+        #start-btn:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow:
+                0 8px 22px rgba(244, 63, 94, 0.45),
+                0 0 16px rgba(251, 70, 169, 0.3);
+        }
+
+        /* MAIN VIEW HEADER */
+        .main-header {
+            padding: 4px 4px 8px;
+            border-bottom: 1px solid rgba(209, 213, 219, 0.9);
+            margin-bottom: 0.7rem;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+        }
+
+        .project-name {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.21em;
+            color: #fb46a9;
+        }
+
+        .project-pill {
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            border: 1px solid rgba(59, 130, 246, 0.55);
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 60%),
+                linear-gradient(135deg, #eff6ff, #fdfbff);
+            font-size: 0.7rem;
+            color: #1f2933;
+            white-space: nowrap;
+        }
+
+        .main-title {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 0.35rem;
+            color: #111827;
+        }
+
+        .main-sub {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .datetime-wrapper {
+            margin-top: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .datetime-pill {
+            font-size: 0.74rem;
+            color: #1f2933;
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            background: #f9fafb;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .inline-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.28);
+        }
+
+        .info-hint {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: right;
+        }
+
+        /* USERS SECTION */
+        .users-section {
+            margin-top: 0.8rem;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.7rem;
+            max-height: calc(100vh - 280px);
+            overflow-y: auto;
+            padding-right: 2px;
+            padding-bottom: 4px;
+        }
+
+        .users-grid::-webkit-scrollbar { width: 6px; }
+        .users-grid::-webkit-scrollbar-track {
+            background: rgba(249, 250, 251, 0.9);
+            border-radius: 999px;
+        }
+        .users-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #fb46a9, #3b82f6);
+            border-radius: 999px;
+        }
+
+        /* USER CARD */
+        .user-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.7rem 0.75rem;
+            border-radius: 18px;
+            border: 1px solid rgba(251, 70, 169, 0.3);
+            background:
+                radial-gradient(circle at top left, rgba(251, 70, 169, 0.16), transparent 60%),
+                radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.15), transparent 60%),
+                linear-gradient(135deg, #ffffff, #fff5fb);
+            cursor: pointer;
+            overflow: hidden;
+
+            opacity: 0;
+            transform: translateY(14px) scale(0.97);
+            box-shadow:
+                0 8px 22px rgba(148, 163, 184, 0.28);
+            transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+
+            animation-name: cardPopIn, cardFloat;
+            animation-duration: 0.42s, 3.1s;
+            animation-timing-function: ease, ease-in-out;
+            animation-fill-mode: forwards, both;
+            animation-iteration-count: 1, infinite;
+            animation-delay: var(--stagger, 0s), 0.5s;
+        }
+
+        .user-card::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 999px;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .user-card:active::after {
+            animation: ripple 0.45s ease-out;
+        }
+
+        .user-card-top {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .avatar-circle {
+            position: relative;
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            background: conic-gradient(from 210deg, #fb46a9, #3b82f6, #fb46a9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.8rem;
+            box-shadow:
+                0 0 0 3px rgba(255, 255, 255, 0.9),
+                0 8px 18px rgba(148, 163, 184, 0.5);
+        }
+
+        .avatar-circle span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .avatar-circle::after {
+            content: "";
+            position: absolute;
+            inset: 3px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, #fb46a9, #3b82f6);
+            opacity: 0.9;
+        }
+
+        .user-main {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .user-sub {
+            font-size: 0.74rem;
+            color: #6b7280;
+        }
+
+        .user-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+            margin-top: 0.25rem;
+        }
+
+        .badge-link {
+            font-size: 0.7rem;
+            padding: 0.18rem 0.6rem;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            background: #f9fafb;
+            color: #1f2933;
+            display: inline-flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .badge-dot-small {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #fb46a9, #3b82f6);
+        }
+
+        .user-index {
+            font-size: 0.7rem;
+            color: #9ca3af;
+        }
+
+        .user-card:hover {
+            transform: translateY(-2px) scale(1.01);
+            border-color: rgba(251, 70, 169, 0.7);
+            box-shadow:
+                0 14px 30px rgba(148, 163, 184, 0.4),
+                0 0 18px rgba(251, 70, 169, 0.25);
+        }
+
+        .user-card:active {
+            transform: translateY(1px) scale(0.99);
+            box-shadow:
+                0 8px 22px rgba(148, 163, 184, 0.35);
+        }
+
+        .footer-note {
+            margin-top: 0.4rem;
+            font-size: 0.72rem;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        /* PAGE: USER LINKS (MULTIPLE LINK) */
+        #user-links-view {
+            display: none;
+            opacity: 0;
+        }
+
+        .links-header {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(209, 213, 219, 0.9);
+            margin-bottom: 0.8rem;
+        }
+
+        .back-btn {
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.9);
+            background: #fff;
+            color: #111827;
+            padding: 0.3rem 0.85rem;
+            font-size: 0.78rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .back-btn:hover {
+            background: #f9fafb;
+        }
+
+        .links-title-block {
+            flex: 1;
+        }
+
+        .links-user-name {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .links-subtitle {
+            font-size: 0.76rem;
+            color: #6b7280;
+        }
+
+        .links-body {
+            margin-top: 0.4rem;
+        }
+
+        .links-info {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .links-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.45rem;
+        }
+
+        .link-btn {
+            border-radius: 14px;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            background:
+                radial-gradient(circle at top left, rgba(251, 70, 169, 0.12), transparent 60%),
+                linear-gradient(135deg, #ffffff, #eff6ff);
+            color: #111827;
+            padding: 0.45rem 0.8rem;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .link-btn span.url-label {
+            font-weight: 500;
+        }
+
+        .link-btn span.url-small {
+            font-size: 0.7rem;
+            color: #6b7280;
+            opacity: 0.9;
+        }
+
+        .link-btn:hover {
+            box-shadow:
+                0 10px 24px rgba(148, 163, 184, 0.36),
+                0 0 16px rgba(59, 130, 246, 0.25);
+        }
+
+        /* EDIT MODAL */
+        .edit-panel-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 60;
+        }
+        .edit-panel-backdrop.show { display: flex; }
+
+        .edit-panel {
+            width: 100%;
+            max-width: 460px;
+            background: linear-gradient(135deg, #fdfbff, #fef2fb);
+            border-radius: 20px;
+            border: 1px solid rgba(251, 70, 169, 0.45);
+            box-shadow:
+                0 30px 80px rgba(148, 163, 184, 0.6),
+                0 0 0 1px rgba(251, 70, 169, 0.25);
+            padding: 14px 14px 12px;
+        }
+
+        .edit-panel-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .edit-panel-sub {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .edit-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .btn-add-user {
+            border-radius: 999px;
+            border: 1px solid rgba(251, 70, 169, 0.7);
+            background: radial-gradient(circle at top left, rgba(251, 70, 169, 0.9), rgba(59, 130, 246, 0.9));
+            padding: 0.25rem 0.85rem;
+            font-size: 0.75rem;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            cursor: pointer;
+        }
+
+        .btn-add-user span.icon {
+            font-size: 0.8rem;
+        }
+
+        .edit-help {
+            font-size: 0.7rem;
+            color: #6b7280;
+            text-align: right;
+            flex: 1;
+        }
+
+        .edit-users-list {
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-bottom: 0.7rem;
+        }
+
+        .edit-users-list::-webkit-scrollbar { width: 6px; }
+        .edit-users-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #fb46a9, #3b82f6);
+            border-radius: 999px;
+        }
+
+        .edit-row {
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed rgba(209, 213, 219, 0.9);
+        }
+
+        .edit-row-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .edit-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .edit-input {
+            flex: 1;
+            border-radius: 999px;
+            border: 1px solid rgba(251, 70, 169, 0.5);
+            background: #fff;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.78rem;
+            color: #111827;
+            outline: none;
+        }
+
+        .edit-input:focus {
+            border-color: #fb46a9;
+            box-shadow: 0 0 0 2px rgba(251, 70, 169, 0.2);
+        }
+
+        .btn-delete-user {
+            border-radius: 999px;
+            border: 1px solid rgba(248, 113, 113, 0.9);
+            padding: 0.26rem 0.6rem;
+            font-size: 0.72rem;
+            background: linear-gradient(135deg, #fecaca, #f87171);
+            color: #7f1d1d;
+            cursor: pointer;
+        }
+
+        .btn-delete-user:hover {
+            filter: brightness(1.05);
+        }
+
+        .edit-row-bottom {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) minmax(0, 1.7fr);
+            gap: 0.35rem;
+            align-items: flex-start;
+            margin-top: 0.15rem;
+        }
+
+        .link-mode-select {
+            width: 100%;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            background: #fff;
+            color: #111827;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.4rem;
+        }
+
+        .link-single-input {
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            background: #fff;
+            color: #111827;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.5rem;
+            width: 100%;
+        }
+
+        .link-multi-textarea {
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            background: #fff;
+            color: #111827;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.5rem;
+            width: 100%;
+            resize: vertical;
+            min-height: 54px;
+        }
+
+        .link-multi-hint {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .edit-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.45rem;
+        }
+
+        .btn-ghost {
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.9);
+            background: #fff;
+            padding: 0.32rem 0.9rem;
+            font-size: 0.78rem;
+            color: #4b5563;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            border-radius: 999px;
+            border: 1px solid rgba(251, 70, 169, 0.8);
+            background: linear-gradient(135deg, #fb46a9, #fb7185, #3b82f6);
+            padding: 0.32rem 1rem;
+            font-size: 0.78rem;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            box-shadow:
+                0 10px 26px rgba(244, 63, 94, 0.45),
+                0 0 18px rgba(251, 70, 169, 0.3);
+        }
+
+        /* ANIMASI */
+        @keyframes cardPopIn {
+            0% {
+                opacity: 0;
+                transform: translateY(18px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes cardFloat {
+            0% {
+                box-shadow:
+                    0 8px 22px rgba(148, 163, 184, 0.28);
+            }
+            50% {
+                box-shadow:
+                    0 14px 30px rgba(148, 163, 184, 0.4),
+                    0 0 20px rgba(251, 70, 169, 0.25);
+            }
+            100% {
+                box-shadow:
+                    0 8px 22px rgba(148, 163, 184, 0.28);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(18);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .app-shell { padding: 18px 13px 16px; }
+            .welcome-title { font-size: 1.7rem; }
+            .main-title { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Edit Button -->
+    <button id="edit-users-btn" type="button">
+        <span class="edit-btn-icon">✎</span>
+        <span>Edit User</span>
+    </button>
+
+    <div class="app-shell">
+        <div class="app-inner">
+            <!-- WELCOME PAGE -->
+            <div id="welcome-page" class="fade-transition" style="opacity:1;">
+                <div class="badge-top">
+                    <span class="badge-dot"></span>
+                    <span>ACORN CONSULTANT</span>
+                </div>
+                <h1 class="welcome-title">Project EXIT<br>Survey Panel</h1>
+                <p class="welcome-sub">
+                    Pusat akses survey terstruktur untuk setiap enumerator, terintegrasi dan mudah dipantau.
+                </p>
+
+                <div class="welcome-panel">
+                    <div class="welcome-panel-title">RANGKUMAN</div>
+                    <div class="welcome-panel-text">
+                        • Multi user dengan link survey yang bisa diatur per user<br>
+                        • Mode 1 link atau multiple link untuk setiap user<br>
+                        • Tambah / hapus user sesuai kebutuhan lapangan
+                    </div>
+                </div>
+
+                <button id="start-btn">ENTER DASHBOARD</button>
+            </div>
+
+            <!-- MAIN VIEW: USER LIST -->
+            <div id="main-view" class="fade-transition" style="display:none; opacity:0;">
+                <div class="main-header">
+                    <div class="title-row">
+                        <div>
+                            <div class="project-name">PROJECT EXIT</div>
+                            <h2 class="main-title">EXIT Survey Hub</h2>
+                        </div>
+                        <div class="project-pill">
+                            Enumerator Access
+                        </div>
+                    </div>
+                    <div class="main-sub">
+                        Panel ini berisi daftar user yang masing-masing dapat diarahkan ke 1 atau beberapa link survey.
+                    </div>
+
+                    <div class="datetime-wrapper">
+                        <div class="datetime-pill">
+                            <span class="inline-dot"></span>
+                            <span id="datetime-text"></span>
+                        </div>
+                        <div class="info-hint">
+                            Klik kartu user untuk membuka link atau daftar link.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="users-section">
+                    <div id="users-grid" class="users-grid"></div>
+                </div>
+
+                <div class="footer-note">
+                    Pengelolaan user (tambah / hapus / ganti nama / link) dilindungi password: <strong>GOOD LUCK!!!</strong>.
+                </div>
+            </div>
+
+            <!-- VIEW: USER MULTIPLE LINKS -->
+            <div id="user-links-view" class="fade-transition">
+                <div class="links-header">
+                    <button id="back-from-links" class="back-btn" type="button">
+                        ← Kembali
+                    </button>
+                    <div class="links-title-block">
+                        <div class="links-user-name" id="links-user-name"></div>
+                        <div class="links-subtitle">Pilih salah satu link di bawah untuk membuka halaman survey.</div>
+                    </div>
+                </div>
+
+                <div class="links-body">
+                    <div class="links-info" id="links-info-text"></div>
+                    <div id="links-buttons-container" class="links-buttons"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT USER -->
+    <div id="edit-panel-backdrop" class="edit-panel-backdrop">
+        <div class="edit-panel">
+            <div class="edit-panel-title">Kelola User Project EXIT</div>
+            <div class="edit-panel-sub">
+                Ubah nama, hapus user yang tidak dipakai, atau atur mode link (1 link / banyak link) untuk setiap user.
+            </div>
+
+            <div class="edit-toolbar">
+                <button id="add-user-btn" class="btn-add-user" type="button">
+                    <span class="icon">＋</span>
+                    <span>Tambah User</span>
+                </button>
+                <div class="edit-help">
+                    Minimal 1 user harus tersisa. Multi link: isi 1 URL per baris.
+                </div>
+            </div>
+
+            <div id="edit-users-list" class="edit-users-list"></div>
+
+            <div class="edit-actions">
+                <button id="edit-cancel" class="btn-ghost" type="button">Batal</button>
+                <button id="edit-save" class="btn-primary" type="button">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const DEFAULT_SURVEY_LINK = "https://survey.xmfactory.com/survey?b=1025655&l=52472bf1b710780c";
+            const PASSWORD_EDIT = "Aco123";
+            const STORAGE_KEY = "projectEXITUsersV2";
+
+            const welcomePage = document.getElementById('welcome-page');
+            const startBtn = document.getElementById('start-btn');
+            const mainView = document.getElementById('main-view');
+            const userLinksView = document.getElementById('user-links-view');
+            const backFromLinks = document.getElementById('back-from-links');
+
+            const usersGrid = document.getElementById('users-grid');
+            const datetimeText = document.getElementById('datetime-text');
+
+            const editBtn = document.getElementById('edit-users-btn');
+            const editBackdrop = document.getElementById('edit-panel-backdrop');
+            const editUsersList = document.getElementById('edit-users-list');
+            const addUserBtn = document.getElementById('add-user-btn');
+            const editCancel = document.getElementById('edit-cancel');
+            const editSave = document.getElementById('edit-save');
+
+            const linksUserName = document.getElementById('links-user-name');
+            const linksInfoText = document.getElementById('links-info-text');
+            const linksButtonsContainer = document.getElementById('links-buttons-container');
+
+            let users = [];
+            let currentLinksUser = null;
+
+            function createDefaultUsers() {
+                const arr = [];
+                for (let i = 1; i <= 13; i++) {
+                    arr.push({
+                        id: `user-${i}`,
+                        name: `User ${i}`,
+                        mode: 'single',
+                        links: [DEFAULT_SURVEY_LINK]
+                    });
+                }
+                return arr;
+            }
+
+            function normalizeUser(u, index) {
+                return {
+                    id: u.id || `user-${index + 1}`,
+                    name: u.name || `User ${index + 1}`,
+                    mode: u.mode === 'multi' ? 'multi' : 'single',
+                    links: Array.isArray(u.links) && u.links.length > 0
+                        ? u.links
+                        : [DEFAULT_SURVEY_LINK]
+                };
+            }
+
+            function loadUsers() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) {
+                        users = createDefaultUsers();
+                        saveUsers();
+                    } else {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            users = parsed.map(normalizeUser);
+                        } else {
+                            users = createDefaultUsers();
+                            saveUsers();
+                        }
+                    }
+                } catch (e) {
+                    users = createDefaultUsers();
+                    saveUsers();
+                }
+            }
+
+            function saveUsers() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+            }
+
+            function renderUserGrid() {
+                usersGrid.innerHTML = '';
+                users.forEach((user, index) => {
+                    const card = document.createElement('button');
+                    card.type = 'button';
+                    card.className = 'user-card';
+                    card.style.setProperty('--stagger', (index * 0.07) + 's');
+
+                    const modeLabel = user.mode === 'multi' ? 'Multiple link' : 'Single link';
+
+                    card.innerHTML = `
+                        <div class="user-card-top">
+                            <div class="avatar-circle">
+                                <span>${index + 1}</span>
+                            </div>
+                            <div class="user-main">
+                                <div class="user-name" title="${user.name}">${user.name}</div>
+                                <div class="user-sub">Project EXIT • ${modeLabel}</div>
+                            </div>
+                        </div>
+                        <div class="user-meta-row">
+                            <div class="badge-link">
+                                <span class="badge-dot-small"></span>
+                                <span>${user.mode === 'multi' ? 'Lihat semua link' : 'Buka link survey'}</span>
+                            </div>
+                            <div class="user-index">ID: ${user.id}</div>
+                        </div>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        handleUserClick(user);
+                    });
+
+                    usersGrid.appendChild(card);
+                });
+            }
+
+            function handleUserClick(user) {
+                if (!user || !Array.isArray(user.links) || user.links.length === 0) {
+                    alert('User ini belum memiliki link, silakan atur di menu Edit User.');
+                    return;
+                }
+
+                if (user.mode === 'multi' && user.links.length > 0) {
+                    openLinksView(user);
+                } else {
+                    const url = user.links[0] || DEFAULT_SURVEY_LINK;
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                }
+            }
+
+            function openLinksView(user) {
+                currentLinksUser = user;
+                linksUserName.textContent = user.name;
+                linksInfoText.textContent = `Total link untuk ${user.name}: ${user.links.length}.`;
+
+                linksButtonsContainer.innerHTML = '';
+                user.links.forEach((url, idx) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'link-btn';
+
+                    const shortUrl = url.length > 40 ? url.slice(0, 37) + '...' : url;
+
+                    btn.innerHTML = `
+                        <span class="url-label">Link ${idx + 1}</span>
+                        <span class="url-small">${shortUrl}</span>
+                    `;
+
+                    btn.addEventListener('click', () => {
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                    });
+
+                    linksButtonsContainer.appendChild(btn);
+                });
+
+                mainView.style.opacity = '0';
+                setTimeout(() => {
+                    mainView.style.display = 'none';
+                    userLinksView.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        userLinksView.style.opacity = '1';
+                    });
+                }, 250);
+            }
+
+            backFromLinks.addEventListener('click', () => {
+                userLinksView.style.opacity = '0';
+                setTimeout(() => {
+                    userLinksView.style.display = 'none';
+                    mainView.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        mainView.style.opacity = '1';
+                    });
+                }, 250);
+            });
+
+            function updateDateTime() {
+                const now = new Date();
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZone: 'Asia/Jakarta'
+                };
+                datetimeText.textContent = now.toLocaleString('id-ID', options);
+            }
+
+            function rebuildEditList() {
+                editUsersList.innerHTML = '';
+                users.forEach((user, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'edit-row';
+
+                    const linksForMulti = user.links.join('\n');
+                    const singleLink = user.links[0] || DEFAULT_SURVEY_LINK;
+
+                    row.innerHTML = `
+                        <div class="edit-row-top">
+                            <div class="edit-label">User ${index + 1}</div>
+                            <input
+                                type="text"
+                                class="edit-input name-input"
+                                data-id="${user.id}"
+                                value="${user.name}"
+                                maxlength="40"
+                            />
+                            <button
+                                type="button"
+                                class="btn-delete-user"
+                                data-id="${user.id}"
+                            >Hapus</button>
+                        </div>
+                        <div class="edit-row-bottom">
+                            <div>
+                                <select class="link-mode-select" data-id="${user.id}">
+                                    <option value="single">1 Link</option>
+                                    <option value="multi">Multiple Link</option>
+                                </select>
+                            </div>
+                            <div>
+                                <input
+                                    type="text"
+                                    class="link-single-input"
+                                    data-id="${user.id}"
+                                    placeholder="https://..."
+                                />
+                            </div>
+                            <div>
+                                <textarea
+                                    class="link-multi-textarea"
+                                    data-id="${user.id}"
+                                    placeholder="Satu link per baris"
+                                ></textarea>
+                                <div class="link-multi-hint">Multi link: isi beberapa URL, tiap baris satu.</div>
+                            </div>
+                        </div>
+                    `;
+
+                    editUsersList.appendChild(row);
+
+                    const modeSelect = row.querySelector('.link-mode-select');
+                    const singleInput = row.querySelector('.link-single-input');
+                    const multiTextarea = row.querySelector('.link-multi-textarea');
+
+                    modeSelect.value = user.mode || 'single';
+                    singleInput.value = singleLink;
+                    multiTextarea.value = linksForMulti;
+
+                    function applyModeUI() {
+                        if (modeSelect.value === 'multi') {
+                            singleInput.style.display = 'none';
+                            multiTextarea.style.display = 'block';
+                        } else {
+                            singleInput.style.display = 'block';
+                            multiTextarea.style.display = 'none';
+                        }
+                    }
+
+                    applyModeUI();
+                    modeSelect.addEventListener('change', applyModeUI);
+                });
+            }
+
+            function openEditPanel() {
+                rebuildEditList();
+                editBackdrop.classList.add('show');
+            }
+
+            // Start button
+            startBtn.addEventListener('click', () => {
+                welcomePage.style.opacity = '0';
+                setTimeout(() => {
+                    welcomePage.style.display = 'none';
+                    mainView.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        mainView.style.opacity = '1';
+                    });
+                }, 350);
+            });
+
+            // Edit button with password
+            editBtn.addEventListener('click', () => {
+                const pwd = prompt('Masukkan password untuk mengelola user:');
+                if (pwd === null) return;
+                if (pwd !== PASSWORD_EDIT) {
+                    alert('Password salah.');
+                    return;
+                }
+                openEditPanel();
+            });
+
+            // Tambah user
+            addUserBtn.addEventListener('click', () => {
+                const newIndex = users.length + 1;
+                const newUser = {
+                    id: `user-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                    name: `User ${newIndex}`,
+                    mode: 'single',
+                    links: [DEFAULT_SURVEY_LINK]
+                };
+                users.push(newUser);
+                rebuildEditList();
+            });
+
+            // Hapus user
+            editUsersList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-delete-user')) {
+                    const id = e.target.getAttribute('data-id');
+                    if (users.length <= 1) {
+                        alert('Minimal harus ada 1 user.');
+                        return;
+                    }
+                    users = users.filter(u => u.id !== id);
+                    rebuildEditList();
+                }
+            });
+
+            // Batal edit
+            editCancel.addEventListener('click', () => {
+                editBackdrop.classList.remove('show');
+            });
+
+            // Simpan perubahan
+            editSave.addEventListener('click', () => {
+                const rows = editUsersList.querySelectorAll('.edit-row');
+                const updated = [];
+
+                rows.forEach(row => {
+                    const nameInput = row.querySelector('.name-input');
+                    const id = nameInput.getAttribute('data-id');
+                    let name = nameInput.value.trim();
+                    if (!name) name = 'User';
+
+                    const modeSelect = row.querySelector('.link-mode-select');
+                    const modeValue = modeSelect.value === 'multi' ? 'multi' : 'single';
+
+                    const singleInput = row.querySelector('.link-single-input');
+                    const multiTextarea = row.querySelector('.link-multi-textarea');
+
+                    let links = [];
+                    if (modeValue === 'multi') {
+                        const lines = multiTextarea.value.split('\n')
+                            .map(l => l.trim())
+                            .filter(l => l.length > 0);
+                        if (lines.length === 0) {
+                            links = [DEFAULT_SURVEY_LINK];
+                        } else {
+                            links = lines;
+                        }
+                    } else {
+                        let url = singleInput.value.trim();
+                        if (!url) url = DEFAULT_SURVEY_LINK;
+                        links = [url];
+                    }
+
+                    updated.push({
+                        id,
+                        name,
+                        mode: modeValue,
+                        links
+                    });
+                });
+
+                users = updated;
+                saveUsers();
+                renderUserGrid();
+                editBackdrop.classList.remove('show');
+            });
+
+            // Close modal if click backdrop
+            editBackdrop.addEventListener('click', (e) => {
+                if (e.target === editBackdrop) {
+                    editBackdrop.classList.remove('show');
+                }
+            });
+
+            // Init
+            function init() {
+                loadUsers();
+                renderUserGrid();
+                updateDateTime();
+                setInterval(updateDateTime, 1000);
+            }
+
+            function updateDateTime() {
+                const now = new Date();
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZone: 'Asia/Jakarta'
+                };
+                datetimeText.textContent = now.toLocaleString('id-ID', options);
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>
