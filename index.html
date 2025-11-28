@@ -111,6 +111,79 @@
             justify-content: center;
         }
 
+        /* SEARCH INPUT */
+        .search-container {
+            margin: 0.6rem 0;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 0.8rem 0.5rem 2.2rem;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            color: #111827;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            border-color: #fb46a9;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(251, 70, 169, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 0.85rem;
+        }
+
+        /* PROGRESS BAR */
+        .user-progress-bar {
+            height: 4px;
+            width: 100%;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 0.35rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fb46a9, #3b82f6);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .user-progress-text {
+            font-size: 0.65rem;
+            color: #64748b;
+            text-align: right;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        /* LINK VISITED STATUS */
+        .link-btn.visited {
+            background: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.3);
+            color: #64748b;
+        }
+        .link-btn.visited .url-label {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        .link-status-icon {
+            font-size: 0.8rem;
+            color: #22c55e;
+            margin-right: 0.3rem;
+            display: none;
+        }
+        .link-btn.visited .link-status-icon {
+            display: inline-block;
+        }
+
         /* WELCOME PAGE */
         #welcome-page {
             min-height: 70vh;
@@ -568,28 +641,60 @@
                 0 0 16px rgba(59, 130, 246, 0.25);
         }
 
+        .link-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: none;
+            color: #fb46a9;
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .btn-copy:hover {
+            background: rgba(251, 70, 169, 0.1);
+        }
+
         /* EDIT MODAL */
         .edit-panel-backdrop {
             position: fixed;
             inset: 0;
             background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 60;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .edit-panel-backdrop.show { display: flex; }
+        .edit-panel-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
 
         .edit-panel {
-            width: 100%;
-            max-width: 460px;
-            background: linear-gradient(135deg, #fdfbff, #fef2fb);
-            border-radius: 20px;
-            border: 1px solid rgba(251, 70, 169, 0.45);
+            width: 95%;
+            max-width: 550px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
             box-shadow:
-                0 30px 80px rgba(148, 163, 184, 0.6),
-                0 0 0 1px rgba(251, 70, 169, 0.25);
-            padding: 14px 14px 12px;
+                0 20px 60px -10px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(251, 70, 169, 0.1);
+            padding: 20px;
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .edit-panel-backdrop.show .edit-panel {
+            transform: scale(1);
         }
 
         .edit-panel-title {
@@ -638,10 +743,14 @@
         }
 
         .edit-users-list {
-            max-height: 260px;
+            max-height: 400px;
             overflow-y: auto;
-            padding-right: 4px;
-            margin-bottom: 0.7rem;
+            padding-right: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 8px;
+            background: rgba(255,255,255,0.5);
         }
 
         .edit-users-list::-webkit-scrollbar { width: 6px; }
@@ -871,6 +980,11 @@
                         Panel ini berisi daftar user yang masing-masing dapat diarahkan ke 1 atau beberapa link survey.
                     </div>
 
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-users" class="search-input" placeholder="Cari nama user...">
+                    </div>
+
                     <div class="datetime-wrapper">
                         <div class="datetime-pill">
                             <span class="inline-dot"></span>
@@ -960,12 +1074,52 @@
             const editCancel = document.getElementById('edit-cancel');
             const editSave = document.getElementById('edit-save');
 
+            const searchInput = document.getElementById('search-users');
+
             const linksUserName = document.getElementById('links-user-name');
             const linksInfoText = document.getElementById('links-info-text');
             const linksButtonsContainer = document.getElementById('links-buttons-container');
 
             let users = [];
             let currentLinksUser = null;
+
+            // Link status tracking
+            const LINK_STATUS_KEY = "projectEXITLinkStatusV1";
+            let linkStatus = {}; // { userId: { url: true } }
+
+            function loadLinkStatus() {
+                try {
+                    const stored = localStorage.getItem(LINK_STATUS_KEY);
+                    if (stored) {
+                        linkStatus = JSON.parse(stored);
+                    }
+                } catch(e) {}
+            }
+
+            function saveLinkStatus() {
+                localStorage.setItem(LINK_STATUS_KEY, JSON.stringify(linkStatus));
+            }
+
+            function markLinkAsVisited(userId, url) {
+                if (!linkStatus[userId]) {
+                    linkStatus[userId] = {};
+                }
+                if (!linkStatus[userId][url]) {
+                    linkStatus[userId][url] = true;
+                    saveLinkStatus();
+                    return true;
+                }
+                return false;
+            }
+
+            function getVisitedCount(user) {
+                if (!linkStatus[user.id]) return 0;
+                let count = 0;
+                user.links.forEach(url => {
+                    if (linkStatus[user.id][url]) count++;
+                });
+                return count;
+            }
 
                         // Auto-generated createDefaultUsers() untuk Project EXIT
             // 8 user, masing-masing 100 link (mode: multi)
@@ -1828,7 +1982,18 @@
             ]
         }
     ];
-}                } catch (e) {
+}
+
+            function loadUsers() {
+                try {
+                    const stored = localStorage.getItem(STORAGE_KEY);
+                    if (stored) {
+                        users = JSON.parse(stored);
+                    } else {
+                        users = createDefaultUsers();
+                    }
+                } catch (e) {
+                    console.error('Error loading users:', e);
                     users = createDefaultUsers();
                     saveUsers();
                 }
@@ -1839,14 +2004,26 @@
             }
 
             function renderUserGrid() {
+                const filter = searchInput.value.toLowerCase();
+                const filteredUsers = users.filter(user => user.name.toLowerCase().includes(filter));
+
                 usersGrid.innerHTML = '';
-                users.forEach((user, index) => {
+                if (filteredUsers.length === 0) {
+                    usersGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #9ca3af; padding: 20px;">Tidak ada user ditemukan.</div>';
+                    return;
+                }
+
+                filteredUsers.forEach((user, index) => {
                     const card = document.createElement('button');
                     card.type = 'button';
                     card.className = 'user-card';
                     card.style.setProperty('--stagger', (index * 0.07) + 's');
 
                     const modeLabel = user.mode === 'multi' ? 'Multiple link' : 'Single link';
+
+                    const visitedCount = getVisitedCount(user);
+                    const totalCount = user.links.length;
+                    const progressPercent = totalCount > 0 ? (visitedCount / totalCount) * 100 : 0;
 
                     card.innerHTML = `
                         <div class="user-card-top">
@@ -1856,6 +2033,10 @@
                             <div class="user-main">
                                 <div class="user-name" title="${user.name}">${user.name}</div>
                                 <div class="user-sub">Project EXIT • ${modeLabel}</div>
+                                <div class="user-progress-bar">
+                                    <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                                </div>
+                                <div class="user-progress-text">${visitedCount}/${totalCount} selesai</div>
                             </div>
                         </div>
                         <div class="user-meta-row">
@@ -1885,6 +2066,8 @@
                     openLinksView(user);
                 } else {
                     const url = user.links[0] || DEFAULT_SURVEY_LINK;
+                    markLinkAsVisited(user.id, url);
+                    renderUserGrid();
                     window.open(url, '_blank', 'noopener,noreferrer');
                 }
             }
@@ -1892,22 +2075,53 @@
             function openLinksView(user) {
                 currentLinksUser = user;
                 linksUserName.textContent = user.name;
-                linksInfoText.textContent = `Total link untuk ${user.name}: ${user.links.length}.`;
+                const visitedCount = getVisitedCount(user);
+                linksInfoText.textContent = `Total link untuk ${user.name}: ${user.links.length} (${visitedCount} selesai).`;
 
                 linksButtonsContainer.innerHTML = '';
                 user.links.forEach((url, idx) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'link-btn';
+                    const isVisited = linkStatus[user.id] && linkStatus[user.id][url];
+                    btn.className = isVisited ? 'link-btn visited' : 'link-btn';
 
                     const shortUrl = url.length > 40 ? url.slice(0, 37) + '...' : url;
 
                     btn.innerHTML = `
-                        <span class="url-label">Link ${idx + 1}</span>
-                        <span class="url-small">${shortUrl}</span>
+                        <div style="text-align:left; flex:1;">
+                            <div class="url-label">
+                                <span class="link-status-icon">✓</span>
+                                Link ${idx + 1}
+                            </div>
+                            <div class="url-small">${shortUrl}</div>
+                        </div>
+                        <div class="link-actions">
+                            <button type="button" class="btn-copy" title="Copy Link">📋</button>
+                            <div style="font-size: 0.7rem; color: var(--pink-main);">Buka ></div>
+                        </div>
                     `;
 
-                    btn.addEventListener('click', () => {
+                    const copyBtn = btn.querySelector('.btn-copy');
+                    copyBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(url).then(() => {
+                            alert('Link disalin!');
+                        }).catch(() => {
+                            alert('Gagal menyalin link.');
+                        });
+                    });
+
+                    btn.addEventListener('click', (e) => {
+                        if(e.target.closest('.btn-copy')) return;
+                        markLinkAsVisited(user.id, url);
+                        btn.classList.add('visited');
+                        // Update info text
+                        const newVisitedCount = getVisitedCount(user);
+                        linksInfoText.textContent = `Total link untuk ${user.name}: ${user.links.length} (${newVisitedCount} selesai).`;
+
+                        // Update grid in background
+                        renderUserGrid();
+
                         window.open(url, '_blank', 'noopener,noreferrer');
                     });
 
@@ -2139,11 +2353,17 @@
                 }
             });
 
+            // Search functionality
+            searchInput.addEventListener('input', () => {
+                renderUserGrid();
+            });
+
             // Init
             function init() {
                 // Bersihkan data lama (versi 2) supaya tidak bentrok dengan konfigurasi 8 user baru
                 try { localStorage.removeItem("projectEXITUsersV2"); } catch (e) {}
                 loadUsers();
+                loadLinkStatus(); // Load visited links
                 renderUserGrid();
                 updateDateTime();
                 setInterval(updateDateTime, 1000);
