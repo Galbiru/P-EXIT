@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project EXIT - Survey Panel</title>
+    <title>Project Parker - Survey Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
@@ -947,7 +947,7 @@
                     <span class="badge-dot"></span>
                     <span>ACORN CONSULTANT</span>
                 </div>
-                <h1 class="welcome-title">Project EXIT<br>Survey Panel</h1>
+                <h1 class="welcome-title">Project Parker<br>Survey Panel</h1>
                 <p class="welcome-sub">
                     Pusat akses survey terstruktur untuk setiap enumerator, terintegrasi dan mudah dipantau.
                 </p>
@@ -969,8 +969,8 @@
                 <div class="main-header">
                     <div class="title-row">
                         <div>
-                            <div class="project-name">PROJECT EXIT</div>
-                            <h2 class="main-title">EXIT Survey Hub</h2>
+                            <div class="project-name">PROJECT Parker</div>
+                            <h2 class="main-title">Parker Survey Hub</h2>
                         </div>
                         <div class="project-pill">
                             Enumerator Access
@@ -1028,7 +1028,7 @@
     <!-- MODAL EDIT USER -->
     <div id="edit-panel-backdrop" class="edit-panel-backdrop">
         <div class="edit-panel">
-            <div class="edit-panel-title">Kelola User Project EXIT</div>
+            <div class="edit-panel-title">Kelola User Project Parker</div>
             <div class="edit-panel-sub">
                 Ubah nama, hapus user yang tidak dipakai, atau atur mode link (1 link / banyak link) untuk setiap user.
             </div>
@@ -1056,7 +1056,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const DEFAULT_SURVEY_LINK = "https://survey.xmfactory.com/survey?b=1025655&l=52472bf1b710780c";
             const PASSWORD_EDIT = "Aco123";
-            const STORAGE_KEY = "projectEXITUsersV3";
+            const STORAGE_KEY = "projectParkerUsersV3";
 
             const welcomePage = document.getElementById('welcome-page');
             const startBtn = document.getElementById('start-btn');
@@ -1084,7 +1084,7 @@
             let currentLinksUser = null;
 
             // Link status tracking
-            const LINK_STATUS_KEY = "projectEXITLinkStatusV1";
+            const LINK_STATUS_KEY = "projectParkerLinkStatusV1";
             let linkStatus = {}; // { userId: { url: true } }
 
             function loadLinkStatus() {
@@ -1121,7 +1121,7 @@
                 return count;
             }
 
-                        // Auto-generated createDefaultUsers() untuk Project EXIT
+                        // Auto-generated createDefaultUsers() untuk Project Parker
             // 8 user, masing-masing 100 link (mode: multi)
             function createDefaultUsers() {
     return [
@@ -2032,7 +2032,7 @@
                             </div>
                             <div class="user-main">
                                 <div class="user-name" title="${user.name}">${user.name}</div>
-                                <div class="user-sub">Project EXIT • ${modeLabel}</div>
+                                <div class="user-sub">Project Parker • ${modeLabel}</div>
                                 <div class="user-progress-bar">
                                     <div class="progress-fill" style="width: ${progressPercent}%"></div>
                                 </div>
@@ -2361,7 +2361,7 @@
             // Init
             function init() {
                 // Bersihkan data lama (versi 2) supaya tidak bentrok dengan konfigurasi 8 user baru
-                try { localStorage.removeItem("projectEXITUsersV2"); } catch (e) {}
+                try { localStorage.removeItem("projectParkerUsersV2"); } catch (e) {}
                 loadUsers();
                 loadLinkStatus(); // Load visited links
                 renderUserGrid();
@@ -2388,3 +2388,4 @@
     </script>
 </body>
 </html>
+
