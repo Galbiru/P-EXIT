@@ -1980,7 +1980,8 @@
                 'https://questionpro.com/a/TakeSurvey?tt=U%252B%2Fnw8dOh5ASA3ruv2A1Wwa%2F3VS0oFOU&mode=languageSelected&externalID=501', // 799
                 'https://questionpro.com/a/TakeSurvey?tt=U%252B%2Fnw8dOh5ASA3ruv2A1W9ZOMlR9Dxh4&mode=languageSelected&externalID=501', // 800
             ]
-                    {
+        },
+        {
             id: 'user-9',
             name: 'Adjeng',
             mode: 'multi',
@@ -2086,8 +2087,6 @@
                 'https://questionpro.com/a/TakeSurvey?tt=U%252B%2Fnw8dOh5Dkw6MzWZOlRAa%2F3VS0oFOU&mode=languageSelected&externalID=501', // 899
                 'https://questionpro.com/a/TakeSurvey?tt=U%252B%2Fnw8dOh5Dkw6MzWZOlRNZOMlR9Dxh4&mode=languageSelected&externalID=501', // 900
             ]
-        }
-
         }
     ];
 }
@@ -2475,20 +2474,6 @@
                 renderUserGrid();
                 updateDateTime();
                 setInterval(updateDateTime, 1000);
-            }
-            function updateDateTime() {
-                const now = new Date();
-                const options = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    timeZone: 'Asia/Jakarta'
-                };
-                datetimeText.textContent = now.toLocaleString('id-ID', options);
             }
 
             init();
