@@ -930,6 +930,31 @@
             .welcome-title { font-size: 1.7rem; }
             .main-title { font-size: 1.2rem; }
         }
+
+        /* HACKER MODE (SECRET) */
+        body.hacker-mode {
+            --pink-main: #00ff41;
+            --pink-soft: #0d0208;
+            --blue-main: #008f11;
+            --blue-soft: #003b00;
+            --white-soft: #000000;
+            --dark-text: #00ff41;
+            --muted: #008f11;
+            background: #000 !important;
+            font-family: 'Courier New', monospace !important;
+        }
+        body.hacker-mode .app-shell {
+            background: #000 !important;
+            border-color: #00ff41 !important;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+        }
+        body.hacker-mode * {
+            border-radius: 0 !important;
+        }
+        body.hacker-mode .welcome-title,
+        body.hacker-mode .main-title {
+            text-shadow: 0 0 5px #00ff41;
+        }
     </style>
 </head>
 <body>
@@ -1079,6 +1104,7 @@
             const linksUserName = document.getElementById('links-user-name');
             const linksInfoText = document.getElementById('links-info-text');
             const linksButtonsContainer = document.getElementById('links-buttons-container');
+            const projectNameEl = document.querySelector('.project-name');
 
             let users = [];
             let currentLinksUser = null;
@@ -1980,7 +2006,8 @@
                 'https://questionpro.com/a/TakeSurvey?tt=U%252B%2Fnw8dOh5ASA3ruv2A1Wwa%2F3VS0oFOU&mode=languageSelected&externalID=501', // 799
                 'https://questionpro.com/a/TakeSurvey?tt=U%252B%2Fnw8dOh5ASA3ruv2A1W9ZOMlR9Dxh4&mode=languageSelected&externalID=501', // 800
             ]
-                    {
+        },
+        {
             id: 'user-9',
             name: 'Adjeng',
             mode: 'multi',
@@ -2086,8 +2113,6 @@
                 'https://questionpro.com/a/TakeSurvey?tt=U%252B%2Fnw8dOh5Dkw6MzWZOlRAa%2F3VS0oFOU&mode=languageSelected&externalID=501', // 899
                 'https://questionpro.com/a/TakeSurvey?tt=U%252B%2Fnw8dOh5Dkw6MzWZOlRNZOMlR9Dxh4&mode=languageSelected&externalID=501', // 900
             ]
-        }
-
         }
     ];
 }
@@ -2226,10 +2251,10 @@
                         // Update info text
                         const newVisitedCount = getVisitedCount(user);
                         linksInfoText.textContent = `Total link untuk ${user.name}: ${user.links.length} (${newVisitedCount} selesai).`;
-                        
+
                         // Update grid in background
                         renderUserGrid();
-                        
+
                         window.open(url, '_blank', 'noopener,noreferrer');
                     });
 
@@ -2466,29 +2491,46 @@
                 renderUserGrid();
             });
 
+            // Secret Hacker Mode Trigger
+            let hackerClickCount = 0;
+            let hackerClickTimer = null;
+
+            if (projectNameEl) {
+                projectNameEl.style.cursor = 'pointer';
+                projectNameEl.style.userSelect = 'none';
+
+                projectNameEl.addEventListener('click', () => {
+                    hackerClickCount++;
+
+                    if (hackerClickTimer) clearTimeout(hackerClickTimer);
+
+                    hackerClickTimer = setTimeout(() => {
+                        hackerClickCount = 0;
+                    }, 2000);
+
+                    if (hackerClickCount >= 5) {
+                        document.body.classList.toggle('hacker-mode');
+                        const isHacker = document.body.classList.contains('hacker-mode');
+                        localStorage.setItem('projectParkerHackerMode', isHacker);
+                        alert(isHacker ? 'SYSTEM BREACHED. HACKER MODE ACTIVATED.' : 'SYSTEM RESTORED.');
+                        hackerClickCount = 0;
+                    }
+                });
+            }
+
             // Init
             function init() {
                 // Bersihkan data lama (versi 2) supaya tidak bentrok dengan konfigurasi 8 user baru
                 try { localStorage.removeItem("projectParkerUsersV2"); } catch (e) {}
                 loadUsers();
                 loadLinkStatus(); // Load visited links
+                // Check stored hacker mode
+                if (localStorage.getItem('projectParkerHackerMode') === 'true') {
+                    document.body.classList.add('hacker-mode');
+                }
                 renderUserGrid();
                 updateDateTime();
                 setInterval(updateDateTime, 1000);
-            }
-            function updateDateTime() {
-                const now = new Date();
-                const options = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    timeZone: 'Asia/Jakarta'
-                };
-                datetimeText.textContent = now.toLocaleString('id-ID', options);
             }
 
             init();
@@ -2496,5 +2538,3 @@
     </script>
 </body>
 </html>
-
-
